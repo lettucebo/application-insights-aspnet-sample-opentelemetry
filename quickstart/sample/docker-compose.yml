@@ -8,8 +8,8 @@ services:
       - SampleApp__TimeAPIUrl=http://sample.timeapi
       - SampleApp__UseApplicationInsights=${USE_APPLICATIONINSIGHTS-false}
       - SampleApp__UseOpenTelemetry=${USE_OPENTELEMETRY-true}
-      - SampleApp__ApplicationInsightsInstrumentationKey=${AI_INSTRUMENTATIONKEY-}
-      - SampleApp__ApplicationInsightsForOpenTelemetryInstrumentationKey=${AI_INSTRUMENTATIONKEY_OPENTELEMETRY-}
+      - SampleApp__ApplicationInsightsInstrumentationKey=${AI_INSTRUMENTATIONKEY}
+      - SampleApp__ApplicationInsightsForOpenTelemetryInstrumentationKey=${AI_INSTRUMENTATIONKEY_OPENTELEMETRY}
       - OpenTelemetry__Prometheus__Url=http://sample.mainapi:9184/metrics/
       - OpenTelemetry__Jaeger__AgentHost=${JAEGER_AGENTHOST-jaeger}
     depends_on:
@@ -20,6 +20,7 @@ services:
     ports:
       - "5001:80"
       - "9184:9184"
+    restart: always
 
   sample.rabbitmqprocessor:
     image: fbeltrao/dotnetobservabilitysample-rabbitmqprocessor
@@ -28,8 +29,8 @@ services:
       - SampleApp__TimeAPIUrl=http://sample.timeapi
       - SampleApp__UseApplicationInsights=${USE_APPLICATIONINSIGHTS-false}
       - SampleApp__UseOpenTelemetry=${USE_OPENTELEMETRY-true}
-      - SampleApp__ApplicationInsightsInstrumentationKey=${AI_INSTRUMENTATIONKEY-}
-      - SampleApp__ApplicationInsightsForOpenTelemetryInstrumentationKey=${AI_INSTRUMENTATIONKEY_OPENTELEMETRY-}
+      - SampleApp__ApplicationInsightsInstrumentationKey=${AI_INSTRUMENTATIONKEY}
+      - SampleApp__ApplicationInsightsForOpenTelemetryInstrumentationKey=${AI_INSTRUMENTATIONKEY_OPENTELEMETRY}
       - OpenTelemetry__Prometheus__Url=http://sample.rabbitmqprocessor:9185/metrics/
       - OpenTelemetry__Jaeger__AgentHost=${JAEGER_AGENTHOST-jaeger}
     depends_on:
@@ -39,6 +40,7 @@ services:
       - jaeger
     ports:
       - "9185:9185"
+    restart: always
 
   sample.timeapi:
     image: fbeltrao/dotnetobservabilitysample-timeapi
@@ -46,8 +48,8 @@ services:
       - SampleApp__RabbitMQHostName=rabbitmq
       - SampleApp__UseApplicationInsights=${USE_APPLICATIONINSIGHTS-false}
       - SampleApp__UseOpenTelemetry=${USE_OPENTELEMETRY-true}
-      - SampleApp__ApplicationInsightsInstrumentationKey=${AI_INSTRUMENTATIONKEY-}
-      - SampleApp__ApplicationInsightsForOpenTelemetryInstrumentationKey=${AI_INSTRUMENTATIONKEY_OPENTELEMETRY-}
+      - SampleApp__ApplicationInsightsInstrumentationKey=${AI_INSTRUMENTATIONKEY}
+      - SampleApp__ApplicationInsightsForOpenTelemetryInstrumentationKey=${AI_INSTRUMENTATIONKEY_OPENTELEMETRY}
       - SqlConnectionString=server=sqlserver;user id=sa;password=Pass@Word1;
       - OpenTelemetry__Jaeger__AgentHost=${JAEGER_AGENTHOST-jaeger}    
     depends_on:
@@ -56,12 +58,14 @@ services:
       - jaeger
     ports:
       - "5002:80"
+    restart: always
 
   rabbitmq:
     image: rabbitmq:3-management
     ports:
       - 15672
       - 5672
+    restart: always
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-GA-ubuntu-16.04
@@ -70,6 +74,7 @@ services:
       - SA_PASSWORD=Pass@Word1
     ports:
       - 1433
+    restart: always
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -82,7 +87,8 @@ services:
     - 5778:5778
     - 16686:16686
     - 14268:14268
-    - 19411:19411    
+    - 19411:19411
+    restart: always
 
   prometheus:
     image: prom/prometheus
@@ -92,6 +98,8 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
         - 9090:9090
+    restart: always
+    
   grafana:
     image: grafana/grafana
     environment: 
@@ -100,3 +108,4 @@ services:
       - prometheus
     ports:
       - 3000:3000
+    restart: always
